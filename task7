@@ -1,0 +1,180 @@
+实验名称：离散时间信号与系统的频域分析
+
+实验日期：2015.5.18
+
+
+
+
+
+一、实验目的
+1、掌握离散时间信号与系统的频域分析方法，从频域的角度对信号与系统的特性进行分析。
+2、掌握离散时间信号傅里叶变换与傅里叶逆变换的实现方法。
+3、掌握离散时间傅里叶变换的特点及应用
+4、掌握离散时间傅里叶变换的数值计算方法及绘制信号频谱的方法
+二、预习内容
+1、离散时间信号的傅里叶变换与逆变换。
+2、离散时间信号频谱的物理含义。
+3、离散时间系统的频率特性。
+4、离散时间系统的频域分析方法。
+三、实验原理
+1. 离散时间系统的频率特性
+在离散LTI系统时域分析中得到系统的单位冲激响应可以完全表征系统，进而通过特性来分析系统的特性。系统单位冲激响应的傅里叶变换成为LTI系统的频率响应。与连续时间LTI系统类似，通过系统频率响应可以分析出系统频率特性。
+与系统单位冲激响应一样，系统的频率响应反映了系统内在的固有特性，它取决于系统自身的结构及组成系统元件的参数，与外部激励无关，是描述系统特性的一个重要参数，是频率的复函数可以表示为：
+
+其中，随频率变化的规律称为幅频特性；随频率变化的规律称为相频特性。
+2. 离散时间信号傅里叶变换的数值计算方法
+算法原理，由傅里叶变换原理可知：
+
+序列的离散时间傅里叶变换是的连续函数。由于数据在matlab中以向量的行驶存在，只能在一个给定的离散频率的集合中计算。然而，只有类似
+
+形式的的有理函数，才能计算其离散时间傅里叶变换。
+3.涉及到的Matlab函数
+3.1 freqz函数：实现离散时间系统频率响应特性的求解
+调用格式:[H,w]=freqz(B,A,N)
+B和A分别为离散系统的系统函数分子、分母多项式的系数向量，返回量H则包含了离散系统频响在 0~范围内N个频率等分点的值（其中N为正整数），w则包含了范围内N个频率等分点。调用默认的N时，其值是512。由于是的连续函数，需要尽可能大地选取N的值，以使得产生的图形和真实离散傅里叶变换的图形尽可能一致。为更加方便快速地运算，应将N的值选为2的幂，如256或512.
+3.2 real函数：求复数的实部
+调用格式:real_f=real (f)；
+3.3 imag函数：求复数的虚部
+调用格式:imag_f=imag (f)；
+3.4 abs函数：求复数的模
+调用格式:abs_f=abs (f)；
+3.5 angle函数：求复数的相位
+调用格式:angle_f=angle (f)；
+3.6 fft函数：实现离散信号的傅里叶变换值
+调用格式：
+F = fft(f)，计算序列的离散傅里叶变换值，其中长度与长度相同
+F = fft(f, L)，计算序列的L点离散傅里叶变换值，其中L不小于N。若L大于N，则需要在计算离散傅里叶变换之前，对尾部补足L-N个零。
+3.7 ifft函数：实现离散信号的傅里叶逆变换
+调用格式：f = ifft(F)
+四、实验内容
+1离散时间傅里叶变换
+(1)下面参考程序是如下序列在范围的离散时间傅里叶变换
+
+%计算离散时间傅里叶变换的频率样本
+clear all;
+w=-4*pi;8*pi/511;4*pi;
+num=[2 1]; den=[1 -0.6];
+h=freqz(num,den,w);
+subplot(2,1,1)
+plot(w/pi,real(h)); grid;
+title(‘实部’)
+xlabel(‘omega/\pi’);
+ylabel(‘振幅’);
+subplot(2,1,2)
+plot(w/pi, imag(h)); grid;
+title(‘虚部’)
+xlabel(‘omega/\pi’);
+ylabel(‘振幅’);
+figure;
+subplot(2,1,1)
+plot(w/pi, abs(h)); grid;
+title(‘幅度谱’)
+xlabel(‘omega/\pi’);
+ylabel(‘振幅’);
+subplot(2,1,2)
+plot(w/pi, angle (h)); grid;
+title(‘相位谱’)
+xlabel(‘omega/\pi’);
+ylabel(‘以弧度为单位的相位’);
+修改程序，在范围内计算如下有限长序列的离散时间傅里叶变换
+h[n]=[1 2 3 4 5 6 7 8 9]
+
+clear all;
+w=0:pi/511:pi;
+h=[1,2,3,4,5,6,7,8,9];
+F=fft(h,512);
+ 
+subplot(2,1,1);
+plot(w/pi,real(F));
+grid;
+title('实部');
+xlabel('omega/\pi');
+ylabel('振幅');
+ 
+subplot(2,1,2);
+plot(w/pi,imag(F));
+grid;
+title('虚部');
+xlabel('omega/\pi');
+ylabel('振幅');
+figure;
+ 
+subplot(2,1,1);
+plot(w/pi,abs(F));
+grid;
+title('幅度谱');
+xlabel('omega/\pi');
+ylabel('振幅');
+ 
+subplot(2,1,2);
+plot(w/pi,angle(F));
+grid;
+title('相位谱');
+xlabel('omega/\pi');
+ylabel('以幅度为单位的相位');
+
+
+(2)利用(1)的程序，通过比较结果的幅度谱和相位谱，验证离散时间傅里叶变换的时移特性。（提示：可设num2=[zeros(1,D),num]）
+clear all;
+D=1;
+w=-4*pi:8*pi/511:4*pi;
+num=[2 1];
+den =[1 -0.6];
+num2=[zeros(1,D),num];
+h=freqz(num,den,w);
+h2=freqz(num2,den,w);
+ 
+subplot(4,2,1);
+plot(w/pi,abs(h));
+grid;
+title('幅度谱');
+xlabel('omega/\pi');
+ylabel('振幅');
+ 
+subplot(4,2,2);
+plot(w/pi,angle(h));
+grid;
+title('相位谱');
+xlabel('omega/\pi');
+ylabel('以弧度为单位的相位');
+ 
+subplot(4,2,3);
+plot(w/pi,abs(h2));
+grid;
+title('幅度谱');
+xlabel('omega/\pi');
+ylabel(' 振幅');
+ 
+subplot(4,2,4);
+plot(w/pi,angle(h2));
+grid;
+title('相位谱');
+xlabel('omega/\pi');
+ylabel('以弧度为单位idea相位');
+ 
+subplot(4,2,5);
+plot(w/pi,abs(h.*exp(-i*w*D)));
+grid;
+title('公式计算幅度谱');
+xlabel('omega/\pi');
+ylabel(' 振幅');
+ 
+subplot(4,2,6);
+plot(w/pi,angle(h.*exp(-i*w*D)));
+grid;
+title('公式计算相位谱');
+ 
+subplot(4,2,7);
+plot(w/pi,((abs(h.*exp(-i*w*D))-abs(h2)))>10^-14);
+title('幅度谱验证');
+grid;
+ 
+subplot(4,2,8);
+plot(w/pi,(angle(h.*exp(-i*w*D))-angle(h2)));
+grid;
+title('相位谱验证');
+axis([-4 4 -1 1]);
+ 
+ 
+ 
+
